@@ -114,3 +114,6 @@ class PublicUserApiTests(TestCase):
             'email': user_details['email'],
         }
         res = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn('access', res.data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
