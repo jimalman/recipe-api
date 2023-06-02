@@ -1,7 +1,7 @@
 """
 Views for the user API.
 """
-from rest_framework import generics, authentication, permissions
+from rest_framework import generics, permissions
 from user.serializers import UserSerializer
 
 
