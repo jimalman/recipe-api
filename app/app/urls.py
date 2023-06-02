@@ -29,4 +29,3 @@ urlpatterns = [
         name='api-docs',
     )
 ]
-
