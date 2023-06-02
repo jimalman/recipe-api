@@ -10,6 +10,7 @@ from rest_framework import status
 
 
 CREATE_USER_URL = reverse('user:create')
+TOKEN_URL = reverse('user:token_obtain_pair')
 
 
 def create_user(**params):
@@ -63,3 +64,53 @@ class PublicUserApiTests(TestCase):
             email=payload['email']
         ).exists()
         self.assertFalse(user_exists)
+
+    def test_create_jwt_for_user(self):
+        """ Test generates jwt for valid credentials """
+        user_details = {
+            'email': 'test@example.com',
+            'password': 'test-pw',
+            'name': 'Test Name',
+        }
+        create_user(**user_details)
+
+        payload = {
+            'email': user_details['email'],
+            'password': user_details['password'],
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertIn('access', res.data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_create_token_bad_credentials(self):
+        """ Test returns error if invalid credentials """
+        user_details = {
+            'email': 'test@example.com',
+            'password': 'test-pw',
+            'name': 'Test Name',
+        }
+        create_user(**user_details)
+
+        payload = {
+            'email': user_details['email'],
+            'password': 'badpass'
+        }
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn('access', res.data)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_create_token_blank_password(self):
+        """ Test returns error if invalid credentials """
+        user_details = {
+            'email': 'test@example.com',
+            'password': 'test-pw',
+            'name': 'Test Name',
+        }
+        create_user(**user_details)
+
+        payload = {
+            'email': user_details['email'],
+        }
+        res = self.client.post(TOKEN_URL, payload)
