@@ -300,6 +300,7 @@ class PrivateRecipeAPITests(TestCase):
                 name=ingredient['name'],
                 user=self.user,
             ).exists()
+            self.assertTrue(exists)
 
     def test_create_recipe_with_existing_ingredients(self):
         """ Test creating a recipe with existing ingredients"""
@@ -354,7 +355,7 @@ class PrivateRecipeAPITests(TestCase):
         self.assertIn(ingredient_pepper, recipe.ingredients.all())
         self.assertNotIn(ingredient_salt, recipe.ingredients.all())
 
-    def test_clear_recipe_tags(self):
+    def test_clear_recipe_ingredients(self):
         ingredient_salt = Ingredient.objects.create(
             user=self.user, name='salt')
         recipe = create_recipe(user=self.user)
