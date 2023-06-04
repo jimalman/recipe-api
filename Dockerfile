@@ -8,9 +8,9 @@ EXPOSE 8000
 
 ARG DEV=false
 RUN pip3 install --upgrade pip && \
-    apk add --update --no-cache postgresql-client && \
+    apk add --update --no-cache postgresql-client jpeg-dev && \
     apk add --update --no-cache --virtual .tmp-build-deps \
-        build-base postgresql-dev musl-dev && \
+        build-base postgresql-dev musl-dev zlib zlib-dev && \
     pip3 install -r /tmp/requirements.txt --no-cache-dir && \
     if [ $DEV = "true" ]; \
         then pip3 install -r /tmp/requirements.dev.txt ; \
@@ -20,6 +20,10 @@ RUN pip3 install --upgrade pip && \
     adduser \
     --disabled-password \
     --no-create-home \
-    django-user
+    django-user && \
+    mkdir -p /vol/web/media && \
+    mkdir -p /vol/web/static && \
+    chown -R django-user:django-user /vol && \
+    chmod -R 755 /vol
 
 USER django-user
