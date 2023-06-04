@@ -17,6 +17,18 @@ from core.models import (
 from recipe import serializers
 
 
+class BaseRecipeAttrViewSet(mixins.ListModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.DestroyModelMixin,
+                            viewsets.GenericViewSet):
+    """ Base viewset for recipe attributes """
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """ Retrieve Tags for authenticated user"""
+        return self.queryset.filter(user=self.request.user).order_by('-name')
+
+
 class RecipeViewSet(viewsets.ModelViewSet):
     """ View for manage recipe APIs."""
     serializer_class = serializers.RecipeDetailSerializer
@@ -39,29 +51,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagViewSet(mixins.ListModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.DestroyModelMixin,
-                 viewsets.GenericViewSet):
+class TagViewSet(BaseRecipeAttrViewSet):
     """ View for managing Tag APIs """
     serializer_class = serializers.TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        """ Retrieve Tags for authenticated user"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
 
 
-class IngredientViewSet(mixins.ListModelMixin,
-                        mixins.UpdateModelMixin,
-                        mixins.DestroyModelMixin,
-                        viewsets.GenericViewSet):
+class IngredientViewSet(BaseRecipeAttrViewSet):
     """ View for manage ingredients """
     serializer_class = serializers.IngredientSerializer
     queryset = Ingredient.objects.all()
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        """ Retrieve Tags for authenticated user"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
