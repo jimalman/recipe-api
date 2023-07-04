@@ -2,6 +2,7 @@ FROM python:3.11.3-alpine3.18
 
 COPY requirements.txt /tmp/requirements.txt
 COPY requirements.dev.txt /tmp/requirements.dev.txt
+COPY ./scripts /scripts
 COPY ./app /app
 WORKDIR /app
 EXPOSE 8000
@@ -10,7 +11,7 @@ ARG DEV=false
 RUN pip3 install --upgrade pip && \
     apk add --update --no-cache postgresql-client jpeg-dev && \
     apk add --update --no-cache --virtual .tmp-build-deps \
-        build-base postgresql-dev musl-dev zlib zlib-dev && \
+        build-base postgresql-dev musl-dev zlib zlib-dev linux-headers && \
     pip3 install -r /tmp/requirements.txt --no-cache-dir && \
     if [ $DEV = "true" ]; \
         then pip3 install -r /tmp/requirements.dev.txt ; \
@@ -24,6 +25,12 @@ RUN pip3 install --upgrade pip && \
     mkdir -p /vol/web/media && \
     mkdir -p /vol/web/static && \
     chown -R django-user:django-user /vol && \
-    chmod -R 755 /vol
+    chmod -R 755 /vol && \
+    chmod -R +x /scripts
+
+ENV PATH="/scripts:/py/bin:$PATH"
 
 USER django-user
+
+CMD ["run.sh"]
+
